@@ -57,7 +57,7 @@ The repo contains a `claude-sync.json` manifest listing what to sync (relative t
 }
 ```
 
-Edit it (and push) to change what syncs everywhere. Plugin *code* is never synced — Claude Code re-fetches enabled plugins itself.
+Edit it (and push) to change what syncs everywhere. Plugin *code* is never synced — only your selections travel. After a pull that changes plugins, restart Claude Code; if a plugin appears missing, reinstall it via `/plugin`.
 
 ## What never syncs
 

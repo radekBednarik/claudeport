@@ -43,6 +43,15 @@ test('loadManifest reads a valid manifest', () => {
   expect(loadManifest(dir)).toEqual({ version: 1, paths: ['settings.json'] });
 });
 
+test('loadManifest rejects unsupported future versions', () => {
+  const dir = tmpDir();
+  fs.writeFileSync(
+    path.join(dir, 'claude-sync.json'),
+    JSON.stringify({ version: 2, paths: ['settings.json'] }),
+  );
+  expect(() => loadManifest(dir)).toThrow(/version/i);
+});
+
 test('loadManifest rejects garbage', () => {
   const dir = tmpDir();
   fs.writeFileSync(path.join(dir, 'claude-sync.json'), '{"paths": "nope"}');

@@ -8,6 +8,16 @@ export interface FileDiff {
   removed: string[]; // in dest, not in src
 }
 
+/** Join base + rel, refusing any result that escapes base. Last line of
+ *  defense — resolveFiles already filters hostile manifest entries. */
+function safeJoin(base: string, rel: string): string {
+  const abs = path.resolve(base, rel);
+  if (!abs.startsWith(path.resolve(base) + path.sep)) {
+    throw new Error(`refusing to touch path outside ${base}: ${rel}`);
+  }
+  return abs;
+}
+
 function sameContent(a: string, b: string): boolean {
   return fs.readFileSync(a).equals(fs.readFileSync(b));
 }
@@ -37,12 +47,12 @@ export function syncFiles(
   const diff = diffFiles(srcDir, destDir, manifest);
   const copied = [...diff.added, ...diff.changed].sort();
   for (const rel of copied) {
-    const dest = path.join(destDir, rel);
+    const dest = safeJoin(destDir, rel);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
-    fs.copyFileSync(path.join(srcDir, rel), dest);
+    fs.copyFileSync(safeJoin(srcDir, rel), dest);
   }
   for (const rel of diff.removed) {
-    fs.rmSync(path.join(destDir, rel));
+    fs.rmSync(safeJoin(destDir, rel));
   }
   return { copied, deleted: diff.removed };
 }
@@ -52,9 +62,9 @@ export function backupFiles(baseDir: string, relPaths: string[], backupRoot: str
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupDir = path.join(backupRoot, `claude-sync-${stamp}`);
   for (const rel of relPaths) {
-    const src = path.join(baseDir, rel);
+    const src = safeJoin(baseDir, rel);
     if (!fs.existsSync(src)) continue;
-    const dest = path.join(backupDir, rel);
+    const dest = safeJoin(backupDir, rel);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.copyFileSync(src, dest);
   }

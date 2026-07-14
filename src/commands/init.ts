@@ -15,7 +15,15 @@ export async function init(remoteUrl: string, opts: { yes?: boolean } = {}): Pro
   }
   fs.mkdirSync(path.dirname(repoDir), { recursive: true });
   git(['clone', remoteUrl, repoDir], path.dirname(repoDir));
+  try {
+    await setup(repoDir, remoteUrl, opts);
+  } catch (err) {
+    fs.rmSync(repoDir, { recursive: true, force: true });
+    throw err;
+  }
+}
 
+async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }): Promise<void> {
   if (fs.existsSync(path.join(repoDir, MANIFEST_FILE))) {
     console.log('Found existing config in the repo — applying it to this machine.');
     await applyRepoToLocal(repoDir, loadManifest(repoDir), opts);

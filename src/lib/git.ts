@@ -18,8 +18,14 @@ export function commitAll(dir: string, message: string): boolean {
   return true;
 }
 
-/** Commits ahead of / behind the upstream of the current branch. */
+/** Commits ahead of / behind the upstream of the current branch.
+ *  Zero/zero when no upstream is configured. */
 export function aheadBehind(dir: string): { ahead: number; behind: number } {
+  try {
+    git(['rev-parse', '@{upstream}'], dir);
+  } catch {
+    return { ahead: 0, behind: 0 };
+  }
   const out = git(['rev-list', '--left-right', '--count', 'HEAD...@{upstream}'], dir);
   const [ahead, behind] = out.split(/\s+/).map(Number);
   return { ahead, behind };

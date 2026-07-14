@@ -37,6 +37,17 @@ test('commitAll commits everything and returns false on a clean tree', () => {
   expect(commitAll(clone, 'noop')).toBe(false);
 });
 
+test('aheadBehind is zero when no upstream is configured', () => {
+  const dir = tmpDir();
+  git(['init', '-b', 'main'], dir);
+  git(['config', 'user.email', 'test@test'], dir);
+  git(['config', 'user.name', 'test'], dir);
+  fs.writeFileSync(path.join(dir, 'a.txt'), 'x');
+  commitAll(dir, 'c1');
+
+  expect(aheadBehind(dir)).toEqual({ ahead: 0, behind: 0 });
+});
+
 test('aheadBehind reports divergence from origin', () => {
   const { remote, clone: a } = makeRemoteAndClone();
   fs.writeFileSync(path.join(a, 'a.txt'), '1');

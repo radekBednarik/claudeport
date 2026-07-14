@@ -84,6 +84,11 @@ export async function applyRepoToLocal(
   }
   syncFiles(repoDir, local, manifest);
   console.log(pc.green('Applied.'));
+  if ([...diff.added, ...diff.changed].some((rel) => rel.startsWith('plugins/'))) {
+    console.log(
+      pc.dim('Plugin selections changed — restart Claude Code; if a plugin is missing, reinstall it via /plugin.'),
+    );
+  }
   return { applied: diff, backupDir };
 }
 
