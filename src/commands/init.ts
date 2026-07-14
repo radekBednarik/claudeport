@@ -14,7 +14,9 @@ export async function init(remoteUrl: string, opts: { yes?: boolean } = {}): Pro
     throw new Error(`${repoDir} already exists — this machine looks already initialized`);
   }
   fs.mkdirSync(path.dirname(repoDir), { recursive: true });
-  git(['clone', remoteUrl, repoDir], path.dirname(repoDir));
+  // `--` stops remoteUrl being parsed as an option; disabling the ext transport
+  // blocks `ext::sh -c '…'` URLs that would run arbitrary local shell on clone.
+  git(['clone', '-c', 'protocol.ext.allow=never', '--', remoteUrl, repoDir], path.dirname(repoDir));
   try {
     await setup(repoDir, remoteUrl, opts);
   } catch (err) {

@@ -70,6 +70,10 @@ A hardcoded denylist wins over the manifest. Credentials (`.credentials.json`, a
 - `push` refuses when the repo moved ahead — pull first, git style. No silent clobbering.
 - Use a **private** repo: your settings may reveal hostnames, hook commands, and workflow details.
 
+### Trust model
+
+**Only sync a repo you fully control.** `pull` writes the repo's `settings.json`, `skills/`, `commands/`, and `agents/` into `~/.claude` — and those can contain hooks and instructions that run arbitrary commands. Pulling from a repo someone else can write to is equivalent to running their code on your machine. The confirm prompt lists which files change; run `claudesync diff` first if you want to see their contents.
+
 ## How it works
 
 Your repo is cloned to `~/.claude-sync`. `push` copies manifest-tracked files from `~/.claude` into the clone, commits, and pushes. `pull` fast-forwards the clone and copies files back. Plain files, plain git — you can inspect, revert, or recover anything with normal git commands in `~/.claude-sync`.

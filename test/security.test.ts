@@ -117,3 +117,28 @@ test('syncFiles with a hostile manifest never writes outside the destination', (
   expect(fs.existsSync(path.join(destParent, 'evil.txt'))).toBe(false);
   expect(fs.readFileSync(path.join(dest, 'settings.json'), 'utf8')).toBe('{}');
 });
+
+test('syncFiles never writes through a pre-existing symlink in the destination', () => {
+  const src = tmpDir();
+  const dest = tmpDir();
+  const outside = path.join(tmpDir(), 'bashrc');
+  fs.writeFileSync(outside, 'ORIGINAL');
+  seed(src, { 'settings.json': 'PWNED' });
+  // dest/settings.json is a symlink pointing outside dest, as a pre-planted attack.
+  fs.symlinkSync(outside, path.join(dest, 'settings.json'));
+
+  expect(() => syncFiles(src, dest, { version: 1, paths: ['settings.json'] })).toThrow(/symlink/);
+  expect(fs.readFileSync(outside, 'utf8')).toBe('ORIGINAL');
+});
+
+test('syncFiles never writes through a symlinked parent directory', () => {
+  const src = tmpDir();
+  const dest = tmpDir();
+  const outside = tmpDir();
+  seed(src, { 'skills/evil.md': 'PWNED' });
+  // dest/skills is a symlink to a directory outside dest.
+  fs.symlinkSync(outside, path.join(dest, 'skills'));
+
+  expect(() => syncFiles(src, dest, { version: 1, paths: ['skills/'] })).toThrow(/symlink/);
+  expect(fs.existsSync(path.join(outside, 'evil.md'))).toBe(false);
+});

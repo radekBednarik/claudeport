@@ -9,11 +9,29 @@ export interface FileDiff {
 }
 
 /** Join base + rel, refusing any result that escapes base. Last line of
- *  defense — resolveFiles already filters hostile manifest entries. */
+ *  defense — resolveFiles already filters hostile manifest entries.
+ *  path.resolve does not follow symlinks, so a symlinked path component could
+ *  still point outside base; reject if any existing component is a symlink so
+ *  a copy/mkdir can never write *through* a link (e.g. settings.json -> ~/.bashrc). */
 function safeJoin(base: string, rel: string): string {
-  const abs = path.resolve(base, rel);
-  if (!abs.startsWith(path.resolve(base) + path.sep)) {
+  const baseAbs = path.resolve(base);
+  const abs = path.resolve(baseAbs, rel);
+  if (abs !== baseAbs && !abs.startsWith(baseAbs + path.sep)) {
     throw new Error(`refusing to touch path outside ${base}: ${rel}`);
+  }
+  let cur = baseAbs;
+  for (const part of path.relative(baseAbs, abs).split(path.sep)) {
+    if (part === '') continue;
+    cur = path.join(cur, part);
+    let stat: fs.Stats;
+    try {
+      stat = fs.lstatSync(cur);
+    } catch {
+      break; // does not exist yet — nothing deeper can be a symlink either
+    }
+    if (stat.isSymbolicLink()) {
+      throw new Error(`refusing to follow symlink into ${base}: ${cur}`);
+    }
   }
   return abs;
 }
