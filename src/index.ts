@@ -11,10 +11,11 @@ program
 program
   .command('init')
   .argument('<remote-url>', 'git remote URL of your config repo')
+  .option('-y, --yes', 'apply adopted config without confirmation')
   .description('link this machine to a config repo (seeds an empty repo, adopts a populated one)')
-  .action(async (remoteUrl: string) => {
+  .action(async (remoteUrl: string, opts: { yes?: boolean }) => {
     const { init } = await import('./commands/init.js');
-    await init(remoteUrl);
+    await init(remoteUrl, opts);
   });
 
 program

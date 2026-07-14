@@ -1,1 +1,47 @@
-export async function init(..._args: unknown[]): Promise<void> { throw new Error('not implemented'); }
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import pc from 'picocolors';
+import { claudeDir, syncDir } from '../lib/paths.js';
+import { commitAll, git } from '../lib/git.js';
+import { DEFAULT_MANIFEST, MANIFEST_FILE, loadManifest } from '../lib/manifest.js';
+import { syncFiles } from '../lib/files.js';
+import { applyRepoToLocal } from '../lib/repo.js';
+
+export async function init(remoteUrl: string, opts: { yes?: boolean } = {}): Promise<void> {
+  const repoDir = syncDir();
+  if (fs.existsSync(repoDir)) {
+    throw new Error(`${repoDir} already exists — this machine looks already initialized`);
+  }
+  fs.mkdirSync(path.dirname(repoDir), { recursive: true });
+  git(['clone', remoteUrl, repoDir], path.dirname(repoDir));
+
+  if (fs.existsSync(path.join(repoDir, MANIFEST_FILE))) {
+    console.log('Found existing config in the repo — applying it to this machine.');
+    await applyRepoToLocal(repoDir, loadManifest(repoDir), opts);
+    return;
+  }
+
+  let hasCommits = true;
+  try {
+    git(['rev-parse', 'HEAD'], repoDir);
+  } catch {
+    hasCommits = false;
+  }
+  if (hasCommits) {
+    throw new Error(
+      `Remote is not empty but has no ${MANIFEST_FILE} — is this the right repo? ` +
+        'Point claudesync at an empty repo or an existing claudesync repo.',
+    );
+  }
+
+  console.log(`Seeding ${remoteUrl} from ${claudeDir()} …`);
+  fs.writeFileSync(
+    path.join(repoDir, MANIFEST_FILE),
+    JSON.stringify(DEFAULT_MANIFEST, null, 2) + '\n',
+  );
+  const { copied } = syncFiles(claudeDir(), repoDir, DEFAULT_MANIFEST);
+  commitAll(repoDir, `claudesync init from ${os.hostname()}`);
+  git(['push', '-u', 'origin', 'HEAD'], repoDir);
+  console.log(pc.green(`Initialized: ${copied.length} file(s) pushed.`));
+}
