@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Sync your Claude Code configuration (settings, skills, agents, plugin selections) across machines via your own git repo",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radekBednarik/claude-sync.git"
+  },
   "bin": {
     "claudesync": "dist/index.js"
   },
@@ -12,6 +16,7 @@
   "engines": {
     "node": ">=20"
   },
+  "packageManager": "pnpm@10.7.1",
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "pnpm build && pnpm test",

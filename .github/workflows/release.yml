@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish # protected gate; name MUST match the npm trusted-publisher config
+    permissions:
+      id-token: write # required for OIDC trusted publishing
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24 # ships npm 11.x (>= 11.5.1)
+          cache: pnpm
+      - run: npm install -g npm@latest # belt-and-suspenders: ensure npm >= 11.5.1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test # tests gate the release
+      - run: pnpm build # produce dist/ (git-ignored, built fresh)
+      - run: npm publish --provenance --ignore-scripts
+        # --ignore-scripts skips the redundant prepublishOnly (build + test already ran above).
+        # No NODE_AUTH_TOKEN / registry-url: npm mints a short-lived token via OIDC.
