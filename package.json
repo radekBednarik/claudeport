@@ -1,0 +1,37 @@
+{
+  "name": "claudesync",
+  "version": "0.1.0",
+  "description": "Sync your Claude Code configuration (settings, skills, agents, plugin selections) across machines via your own git repo",
+  "type": "module",
+  "bin": {
+    "claudesync": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "sync",
+    "dotfiles",
+    "config"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
