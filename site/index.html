@@ -5,13 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>claudeport — sync your Claude Code config across machines</title>
   <meta name="description" content="claudeport syncs your Claude Code configuration — settings, skills, agents, commands, plugin selections — across machines through a git repo you own. No server, no accounts." />
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="claudeport" />
+  <!-- Canonical + crawling -->
+  <link rel="canonical" href="https://radekbednarik.github.io/claudeport/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Radek Bednarik" />
+  <meta name="keywords" content="claude code, claude code config sync, dotfiles, config sync, claude, cli" />
+
+  <!-- Icons + theming -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#0a0d0e" />
+  <meta name="color-scheme" content="dark light" />
+
+  <!-- Open Graph (Facebook, LinkedIn, Slack, Discord, …) -->
+  <meta property="og:title" content="claudeport — sync your Claude Code config across machines" />
   <meta property="og:description" content="Sync your Claude Code config across machines, through a git repo you own. No server, no accounts." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://radekbednarik.github.io/claudeport/" />
+  <meta property="og:site_name" content="claudeport" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content="https://radekbednarik.github.io/claudeport/og-image.png" />
+  <meta property="og:image:secure_url" content="https://radekbednarik.github.io/claudeport/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="claudeport — sync your Claude Code config between a workstation and a notebook through your own git repo." />
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="claudeport — sync your Claude Code config across machines" />
+  <meta name="twitter:description" content="Sync your Claude Code config across machines, through a git repo you own. No server, no accounts." />
+  <meta name="twitter:image" content="https://radekbednarik.github.io/claudeport/og-image.png" />
+  <meta name="twitter:image:alt" content="claudeport — sync your Claude Code config between a workstation and a notebook through your own git repo." />
+
+  <!-- Structured data: helps search engines show a rich result for the CLI tool -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "claudeport",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, macOS, Windows",
+    "description": "Sync your Claude Code configuration — settings, skills, agents, commands, plugin selections, CLAUDE.md, keybindings — across machines through a git repo you own. No server, no accounts.",
+    "url": "https://radekbednarik.github.io/claudeport/",
+    "downloadUrl": "https://www.npmjs.com/package/claudeport",
+    "softwareVersion": "0.1.2",
+    "image": "https://radekbednarik.github.io/claudeport/og-image.png",
+    "author": {
+      "@type": "Person",
+      "name": "Radek Bednarik"
+    },
+    "license": "https://github.com/radekBednarik/claudeport/blob/main/LICENSE",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
 
   <!-- Fonts: distinctive display + mono + body, with a full system fallback in styles.css -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
