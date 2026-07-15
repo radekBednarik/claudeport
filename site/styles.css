@@ -262,8 +262,23 @@ p code, li code, td code, h3 code {
   50%      { filter: drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 55%, transparent)); }
 }
 
+/* interactive verb chips directly under the diagram */
+.topo__keys {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem;
+  margin-top: 1.1rem;
+}
+.key {
+  font-family: var(--font-mono); font-size: 0.82rem; font-weight: 500;
+  color: var(--ink-dim); cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 999px; padding: 0.4rem 0.85rem;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.key:hover, .key:focus-visible { color: var(--ink); border-color: var(--accent); transform: translateY(-1px); outline: none; }
+.key.is-locked { color: #04100e; background: var(--accent); border-color: var(--accent); font-weight: 700; }
+
 .topo__cap {
-  margin-top: 1rem; text-align: center;
+  margin-top: 0.9rem; text-align: center;
   font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-faint);
 }
 

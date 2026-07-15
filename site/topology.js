@@ -84,12 +84,39 @@
       for (const key of spec.pulse || []) nodes[key]?.classList.add("is-pulse");
     }
 
-    for (const card of document.querySelectorAll(".cmd")) {
-      const flow = card.getAttribute("data-flow");
-      card.addEventListener("mouseenter", () => activate(flow));
-      card.addEventListener("focus", () => activate(flow));
-      card.addEventListener("mouseleave", clear);
-      card.addEventListener("blur", clear);
+    // hover/focus triggers: command cards (bonus) + the verb chips beside the diagram
+    for (const trigger of document.querySelectorAll(".cmd, .key")) {
+      const flow = trigger.getAttribute("data-flow");
+      trigger.addEventListener("mouseenter", () => activate(flow));
+      trigger.addEventListener("focus", () => activate(flow));
+      trigger.addEventListener("mouseleave", clearUnlessLocked);
+      trigger.addEventListener("blur", clearUnlessLocked);
+    }
+
+    // touch/click: chips latch a flow (no hover on touch devices)
+    let locked = null;
+    function clearUnlessLocked() {
+      if (locked) activate(locked);
+      else clear();
+    }
+    for (const key of document.querySelectorAll(".key")) {
+      const flow = key.getAttribute("data-flow");
+      key.setAttribute("aria-pressed", "false");
+      key.addEventListener("click", () => {
+        const keys = document.querySelectorAll(".key");
+        if (locked === flow) {
+          locked = null;
+          clear();
+        } else {
+          locked = flow;
+          activate(flow);
+        }
+        for (const k of keys) {
+          const on = locked === k.getAttribute("data-flow");
+          k.setAttribute("aria-pressed", String(on));
+          k.classList.toggle("is-locked", on);
+        }
+      });
     }
   }
 
