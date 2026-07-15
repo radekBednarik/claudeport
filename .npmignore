@@ -1,0 +1,38 @@
+# Defense-in-depth denylist. The primary control is the `files: ["dist"]`
+# allowlist in package.json — that alone limits the published tarball to
+# dist/, README.md, and package.json. This file guards against accidental
+# leaks if that allowlist is ever loosened.
+
+# Source & tests (compiled output lives in dist/)
+src/
+test/
+**/*.ts
+**/*.map
+**/*.tsbuildinfo
+
+# Tooling & CI
+.github/
+docs/
+tsconfig.json
+vitest.config.*
+.editorconfig
+.prettier*
+.eslint*
+
+# Lockfiles & package-manager cruft
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Env, secrets, local config
+.env
+.env.*
+*.local
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log
