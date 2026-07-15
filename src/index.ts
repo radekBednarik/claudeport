@@ -52,6 +52,46 @@ program
     await diff();
   });
 
+const config = program
+  .command('config')
+  .description('view or change where claudesync reads config (env var > config file > default)');
+
+config
+  .command('set')
+  .argument('<key>', 'config key: claude-dir | sync-dir')
+  .argument('<value>', 'directory path (a leading ~ and relative paths are resolved)')
+  .description('store a config value in the native config file')
+  .action(async (key: string, value: string) => {
+    const { configSet } = await import('./commands/config.js');
+    configSet(key, value);
+  });
+
+config
+  .command('get')
+  .argument('[key]', 'config key: claude-dir | sync-dir (omit to list all)')
+  .description('print stored config value(s)')
+  .action(async (key: string | undefined) => {
+    const { configGet } = await import('./commands/config.js');
+    configGet(key);
+  });
+
+config
+  .command('unset')
+  .argument('<key>', 'config key: claude-dir | sync-dir')
+  .description('remove a config value')
+  .action(async (key: string) => {
+    const { configUnset } = await import('./commands/config.js');
+    configUnset(key);
+  });
+
+config
+  .command('path')
+  .description('print the config file location')
+  .action(async () => {
+    const { configPath } = await import('./commands/config.js');
+    configPath();
+  });
+
 program.parseAsync().catch((err: unknown) => {
   console.error(err instanceof Error ? err.message : String(err));
   process.exit(1);

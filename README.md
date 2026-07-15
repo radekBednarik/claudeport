@@ -78,10 +78,28 @@ A hardcoded denylist wins over the manifest. Credentials (`.credentials.json`, a
 
 Your repo is cloned to `~/.claude-sync`. `push` copies manifest-tracked files from `~/.claude` into the clone, commits, and pushes. `pull` fast-forwards the clone and copies files back. Plain files, plain git — you can inspect, revert, or recover anything with normal git commands in `~/.claude-sync`.
 
-| Env var | Effect |
-| --- | --- |
-| `CLAUDE_CONFIG_DIR` | Claude config dir (default `~/.claude`) |
-| `CLAUDESYNC_DIR` | Clone location (default `~/.claude-sync`) |
+## Configuration
+
+By default claudesync reads `~/.claude` and clones into `~/.claude-sync`. Override
+either with the `config` command, which persists to a file in your native config dir
+(`~/.config/claudesync/config.json` on Linux/macOS, `%APPDATA%\claudesync\config.json`
+on Windows):
+
+```sh
+claudesync config set claude-dir ~/custom/.claude   # where your Claude config lives
+claudesync config set sync-dir  ~/custom/.claude-sync   # where the repo is cloned
+claudesync config get           # list current values
+claudesync config unset claude-dir
+claudesync config path          # print the config file location
+```
+
+Each dir is resolved as **env var > config file > default**, so the env vars still
+work as a per-shell / CI override:
+
+| Setting | Env var | Config key | Default |
+| --- | --- | --- | --- |
+| Claude config dir | `CLAUDE_CONFIG_DIR` | `claude-dir` | `~/.claude` |
+| Clone location | `CLAUDESYNC_DIR` | `sync-dir` | `~/.claude-sync` |
 
 ## Not (yet) synced
 
