@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import pc from 'picocolors';
-import { claudeDir, syncDir } from '../lib/paths.js';
-import { commitAll, git } from '../lib/git.js';
-import { DEFAULT_MANIFEST, MANIFEST_FILE, loadManifest } from '../lib/manifest.js';
 import { syncFiles } from '../lib/files.js';
+import { commitAll, git } from '../lib/git.js';
+import { DEFAULT_MANIFEST, loadManifest, MANIFEST_FILE } from '../lib/manifest.js';
+import { claudeDir, syncDir } from '../lib/paths.js';
 import { applyRepoToLocal } from '../lib/repo.js';
 
 export async function init(remoteUrl: string, opts: { yes?: boolean } = {}): Promise<void> {
@@ -48,7 +48,7 @@ async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }
   console.log(`Seeding ${remoteUrl} from ${claudeDir()} …`);
   fs.writeFileSync(
     path.join(repoDir, MANIFEST_FILE),
-    JSON.stringify(DEFAULT_MANIFEST, null, 2) + '\n',
+    `${JSON.stringify(DEFAULT_MANIFEST, null, 2)}\n`,
   );
   const { copied } = syncFiles(claudeDir(), repoDir, DEFAULT_MANIFEST);
   commitAll(repoDir, `claudeport init from ${os.hostname()}`);

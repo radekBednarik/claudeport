@@ -50,5 +50,5 @@ export function readConfig(): Config {
 export function writeConfig(cfg: Config): void {
   const file = configFilePath();
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(cfg, null, 2) + '\n');
+  fs.writeFileSync(file, `${JSON.stringify(cfg, null, 2)}\n`);
 }

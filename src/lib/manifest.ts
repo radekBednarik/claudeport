@@ -37,11 +37,7 @@ const DENIED_DIRS = new Set([
   'downloads',
   'todos',
 ]);
-const DENIED_FILES = new Set([
-  'history.jsonl',
-  'policy-limits.json',
-  'remote-settings.json',
-]);
+const DENIED_FILES = new Set(['history.jsonl', 'policy-limits.json', 'remote-settings.json']);
 
 /** Normalize a manifest entry to a safe repo-relative path, or null if it is
  *  hostile (absolute, or escaping the base dir). Manifest entries come from the

@@ -1,8 +1,8 @@
 import os from 'node:os';
 import pc from 'picocolors';
-import { claudeDir } from '../lib/paths.js';
-import { aheadBehind, commitAll, git } from '../lib/git.js';
 import { syncFiles } from '../lib/files.js';
+import { aheadBehind, commitAll, git } from '../lib/git.js';
+import { claudeDir } from '../lib/paths.js';
 import { openRepo } from '../lib/repo.js';
 
 export async function push(opts: { message?: string } = {}): Promise<void> {
@@ -14,7 +14,9 @@ export async function push(opts: { message?: string } = {}): Promise<void> {
   }
   const { behind } = aheadBehind(repoDir);
   if (behind > 0) {
-    throw new Error(`Sync repo is ${behind} commit(s) behind the remote — run \`claudeport pull\` first`);
+    throw new Error(
+      `Sync repo is ${behind} commit(s) behind the remote — run \`claudeport pull\` first`,
+    );
   }
 
   const { copied, deleted } = syncFiles(claudeDir(), repoDir, manifest);
@@ -24,5 +26,9 @@ export async function push(opts: { message?: string } = {}): Promise<void> {
     return;
   }
   git(['push'], repoDir);
-  console.log(pc.green(`Pushed ${copied.length} file(s)${deleted.length ? `, ${deleted.length} deletion(s)` : ''}.`));
+  console.log(
+    pc.green(
+      `Pushed ${copied.length} file(s)${deleted.length ? `, ${deleted.length} deletion(s)` : ''}.`,
+    ),
+  );
 }

@@ -1,9 +1,9 @@
-import { expect, test } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { isDenied, resolveFiles } from '../src/lib/manifest.js';
+import { expect, test } from 'vitest';
 import { syncFiles } from '../src/lib/files.js';
+import { isDenied, resolveFiles } from '../src/lib/manifest.js';
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-sec-'));

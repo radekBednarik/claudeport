@@ -1,13 +1,8 @@
-import { expect, test } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {
-  DEFAULT_MANIFEST,
-  isDenied,
-  loadManifest,
-  resolveFiles,
-} from '../src/lib/manifest.js';
+import { expect, test } from 'vitest';
+import { DEFAULT_MANIFEST, isDenied, loadManifest, resolveFiles } from '../src/lib/manifest.js';
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-test-'));

@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, expect, test } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { claudeDir, syncDir } from '../src/lib/paths.js';
+import { afterEach, beforeEach, expect, test } from 'vitest';
 import { writeConfig } from '../src/lib/config.js';
+import { claudeDir, syncDir } from '../src/lib/paths.js';
 
 const saved = { ...process.env };
 let tmp: string;

@@ -1,7 +1,7 @@
 import pc from 'picocolors';
 import { aheadBehind, git } from '../lib/git.js';
 import { loadManifest } from '../lib/manifest.js';
-import { applyRepoToLocal, openRepo, type ApplyResult } from '../lib/repo.js';
+import { type ApplyResult, applyRepoToLocal, openRepo } from '../lib/repo.js';
 
 export async function pull(opts: { yes?: boolean } = {}): Promise<ApplyResult> {
   const { repoDir } = openRepo();

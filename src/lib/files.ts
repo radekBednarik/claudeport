@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveFiles, type Manifest } from './manifest.js';
+import { type Manifest, resolveFiles } from './manifest.js';
 
 export interface FileDiff {
   added: string[]; // in src, not in dest

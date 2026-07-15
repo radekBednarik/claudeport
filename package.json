@@ -22,7 +22,12 @@
     "build:watch": "tsc --watch",
     "prepublishOnly": "pnpm build && pnpm test",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
+    "format": "biome format --write",
+    "check": "biome check",
+    "check:fix": "biome check --write"
   },
   "keywords": [
     "claude",
@@ -37,6 +42,7 @@
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.4",
     "@types/node": "^24.0.0",
     "typescript": "^5.8.0",
     "vitest": "^3.2.0"

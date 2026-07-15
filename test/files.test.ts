@@ -1,7 +1,7 @@
-import { expect, test } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { expect, test } from 'vitest';
 import { backupFiles, diffFiles, syncFiles } from '../src/lib/files.js';
 import type { Manifest } from '../src/lib/manifest.js';
 

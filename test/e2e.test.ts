@@ -1,13 +1,14 @@
-import { afterAll, expect, test } from 'vitest';
+import assert from 'node:assert';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { init } from '../src/commands/init.js';
-import { push } from '../src/commands/push.js';
-import { pull } from '../src/commands/pull.js';
-import { status } from '../src/commands/status.js';
+import { afterAll, expect, test } from 'vitest';
 import { diff } from '../src/commands/diff.js';
+import { init } from '../src/commands/init.js';
+import { pull } from '../src/commands/pull.js';
+import { push } from '../src/commands/push.js';
+import { status } from '../src/commands/status.js';
 
 // Two fake machines (A = workstation, B = notebook) sharing a local bare repo.
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-e2e-'));
@@ -91,10 +92,10 @@ test('push from B, pull on A round-trips changes including deletions', async () 
   expect(read(A.claude, 'skills/bar/SKILL.md')).toBe('bar skill');
   expect(fs.existsSync(path.join(A.claude, 'skills/foo/SKILL.md'))).toBe(false);
   // overwritten files were backed up
-  expect(result.backupDir).toBeTruthy();
-  expect(read(A.claude, path.relative(A.claude, path.join(result.backupDir!, 'settings.json')))).toBe(
-    '{"model":"opus"}',
-  );
+  assert(result.backupDir, 'expected a backup dir');
+  expect(
+    read(A.claude, path.relative(A.claude, path.join(result.backupDir, 'settings.json'))),
+  ).toBe('{"model":"opus"}');
   // machine-local files untouched
   expect(read(A.claude, 'history.jsonl')).toBe('machine-local');
 });

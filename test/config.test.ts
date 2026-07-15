@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, expect, test } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { afterEach, beforeEach, expect, test } from 'vitest';
 import { configFilePath, readConfig, writeConfig } from '../src/lib/config.js';
 
 const savedEnv = { ...process.env };
@@ -80,5 +80,8 @@ test('writeConfig preserves unknown keys on disk', () => {
   fs.writeFileSync(file, JSON.stringify({ future: 'keep me', claudeDir: '/old' }));
   const cfg = readConfig();
   writeConfig({ ...cfg, claudeDir: '/new' });
-  expect(JSON.parse(fs.readFileSync(file, 'utf8'))).toEqual({ future: 'keep me', claudeDir: '/new' });
+  expect(JSON.parse(fs.readFileSync(file, 'utf8'))).toEqual({
+    future: 'keep me',
+    claudeDir: '/new',
+  });
 });

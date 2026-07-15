@@ -1,11 +1,11 @@
-import { afterAll, afterEach, expect, test, vi } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { afterAll, afterEach, expect, test, vi } from 'vitest';
 import { init } from '../src/commands/init.js';
-import { push } from '../src/commands/push.js';
 import { pull } from '../src/commands/pull.js';
+import { push } from '../src/commands/push.js';
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-edge-'));
 let n = 0;
@@ -55,7 +55,10 @@ test('pull explains what to do when the clone has diverged', async () => {
   on(a);
   await init(a.remote);
   // second machine pushes a change
-  const b = { claude: path.join(root, `${n}b/.claude`), sync: path.join(root, `${n}b/.claudeport`) };
+  const b = {
+    claude: path.join(root, `${n}b/.claude`),
+    sync: path.join(root, `${n}b/.claudeport`),
+  };
   fs.mkdirSync(b.claude, { recursive: true });
   on(b);
   await init(a.remote, { yes: true });
@@ -77,7 +80,10 @@ test('pull hints about plugins when plugin selections change', async () => {
   on(a);
   await init(a.remote);
 
-  const b = { claude: path.join(root, `${n}p/.claude`), sync: path.join(root, `${n}p/.claudeport`) };
+  const b = {
+    claude: path.join(root, `${n}p/.claude`),
+    sync: path.join(root, `${n}p/.claudeport`),
+  };
   fs.mkdirSync(b.claude, { recursive: true });
   on(b);
   const log = vi.spyOn(console, 'log');

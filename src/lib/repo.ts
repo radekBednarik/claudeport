@@ -1,11 +1,11 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline/promises';
-import { execFileSync } from 'node:child_process';
 import pc from 'picocolors';
-import { claudeDir, syncDir } from './paths.js';
+import { backupFiles, diffFiles, type FileDiff, syncFiles } from './files.js';
 import { loadManifest, MANIFEST_FILE, type Manifest } from './manifest.js';
-import { backupFiles, diffFiles, syncFiles, type FileDiff } from './files.js';
+import { claudeDir, syncDir } from './paths.js';
 
 export function openRepo(): { repoDir: string; manifest: Manifest } {
   const repoDir = syncDir();
@@ -15,7 +15,10 @@ export function openRepo(): { repoDir: string; manifest: Manifest } {
   return { repoDir, manifest: loadManifest(repoDir) };
 }
 
-export function printDiff(diff: FileDiff, labels: { added: string; changed: string; removed: string }): void {
+export function printDiff(
+  diff: FileDiff,
+  labels: { added: string; changed: string; removed: string },
+): void {
   for (const rel of diff.added) console.log(pc.green(`  ${labels.added} ${rel}`));
   for (const rel of diff.changed) console.log(pc.yellow(`  ${labels.changed} ${rel}`));
   for (const rel of diff.removed) console.log(pc.red(`  ${labels.removed} ${rel}`));
@@ -86,7 +89,9 @@ export async function applyRepoToLocal(
   console.log(pc.green('Applied.'));
   if ([...diff.added, ...diff.changed].some((rel) => rel.startsWith('plugins/'))) {
     console.log(
-      pc.dim('Plugin selections changed — restart Claude Code; if a plugin is missing, reinstall it via /plugin.'),
+      pc.dim(
+        'Plugin selections changed — restart Claude Code; if a plugin is missing, reinstall it via /plugin.',
+      ),
     );
   }
   return { applied: diff, backupDir };

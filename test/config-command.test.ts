@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { configGet, configSet, configUnset } from '../src/commands/config.js';
 import { configFilePath, readConfig } from '../src/lib/config.js';
 
