@@ -8,5 +8,5 @@ export function claudeDir(): string {
 }
 
 export function syncDir(): string {
-  return process.env.CLAUDESYNC_DIR ?? readConfig().syncDir ?? path.join(os.homedir(), '.claude-sync');
+  return process.env.CLAUDEPORT_DIR ?? readConfig().syncDir ?? path.join(os.homedir(), '.claudeport');
 }

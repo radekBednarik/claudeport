@@ -13,7 +13,7 @@ function setPlatform(value: NodeJS.Platform): void {
 }
 
 beforeEach(() => {
-  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-cfg-'));
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-cfg-'));
 });
 
 afterEach(() => {
@@ -25,19 +25,19 @@ afterEach(() => {
 test('configFilePath honors XDG_CONFIG_HOME on non-Windows', () => {
   setPlatform('linux');
   process.env.XDG_CONFIG_HOME = tmp;
-  expect(configFilePath()).toBe(path.join(tmp, 'claudesync', 'config.json'));
+  expect(configFilePath()).toBe(path.join(tmp, 'claudeport', 'config.json'));
 });
 
 test('configFilePath falls back to ~/.config on non-Windows', () => {
   setPlatform('darwin');
   delete process.env.XDG_CONFIG_HOME;
-  expect(configFilePath()).toBe(path.join(os.homedir(), '.config', 'claudesync', 'config.json'));
+  expect(configFilePath()).toBe(path.join(os.homedir(), '.config', 'claudeport', 'config.json'));
 });
 
 test('configFilePath honors APPDATA on Windows', () => {
   setPlatform('win32');
   process.env.APPDATA = tmp;
-  expect(configFilePath()).toBe(path.join(tmp, 'claudesync', 'config.json'));
+  expect(configFilePath()).toBe(path.join(tmp, 'claudeport', 'config.json'));
 });
 
 test('readConfig returns {} when the file is absent', () => {

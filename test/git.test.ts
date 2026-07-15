@@ -5,7 +5,7 @@ import path from 'node:path';
 import { aheadBehind, commitAll, git } from '../src/lib/git.js';
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-test-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-test-'));
 }
 
 function makeRemoteAndClone(): { remote: string; clone: string } {

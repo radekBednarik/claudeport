@@ -7,7 +7,7 @@ import { init } from '../src/commands/init.js';
 import { push } from '../src/commands/push.js';
 import { pull } from '../src/commands/pull.js';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-edge-'));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-edge-'));
 let n = 0;
 
 Object.assign(process.env, {
@@ -25,12 +25,12 @@ function fixture(): { remote: string; claude: string; sync: string } {
   const claude = path.join(dir, '.claude');
   fs.mkdirSync(claude);
   fs.writeFileSync(path.join(claude, 'settings.json'), '{}');
-  return { remote, claude, sync: path.join(dir, '.claude-sync') };
+  return { remote, claude, sync: path.join(dir, '.claudeport') };
 }
 
 function on(m: { claude: string; sync: string }): void {
   process.env.CLAUDE_CONFIG_DIR = m.claude;
-  process.env.CLAUDESYNC_DIR = m.sync;
+  process.env.CLAUDEPORT_DIR = m.sync;
 }
 
 afterEach(() => vi.restoreAllMocks());
@@ -47,7 +47,7 @@ test('failed init cleans up so it can be retried', async () => {
 
   fs.rmSync(hook);
   await init(m.remote); // retry succeeds
-  expect(fs.existsSync(path.join(m.sync, 'claude-sync.json'))).toBe(true);
+  expect(fs.existsSync(path.join(m.sync, 'claudeport.json'))).toBe(true);
 });
 
 test('pull explains what to do when the clone has diverged', async () => {
@@ -55,7 +55,7 @@ test('pull explains what to do when the clone has diverged', async () => {
   on(a);
   await init(a.remote);
   // second machine pushes a change
-  const b = { claude: path.join(root, `${n}b/.claude`), sync: path.join(root, `${n}b/.claude-sync`) };
+  const b = { claude: path.join(root, `${n}b/.claude`), sync: path.join(root, `${n}b/.claudeport`) };
   fs.mkdirSync(b.claude, { recursive: true });
   on(b);
   await init(a.remote, { yes: true });
@@ -77,7 +77,7 @@ test('pull hints about plugins when plugin selections change', async () => {
   on(a);
   await init(a.remote);
 
-  const b = { claude: path.join(root, `${n}p/.claude`), sync: path.join(root, `${n}p/.claude-sync`) };
+  const b = { claude: path.join(root, `${n}p/.claude`), sync: path.join(root, `${n}p/.claudeport`) };
   fs.mkdirSync(b.claude, { recursive: true });
   on(b);
   const log = vi.spyOn(console, 'log');

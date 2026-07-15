@@ -8,7 +8,7 @@ import type { Manifest } from '../src/lib/manifest.js';
 const manifest: Manifest = { version: 1, paths: ['settings.json', 'skills/'] };
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-test-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-test-'));
 }
 
 function seed(dir: string, files: Record<string, string>): void {

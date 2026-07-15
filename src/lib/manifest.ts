@@ -6,7 +6,7 @@ export interface Manifest {
   paths: string[];
 }
 
-export const MANIFEST_FILE = 'claude-sync.json';
+export const MANIFEST_FILE = 'claudeport.json';
 
 export const DEFAULT_MANIFEST: Manifest = {
   version: 1,
@@ -78,7 +78,7 @@ export function loadManifest(repoDir: string): Manifest {
   }
   const version = (data as Manifest).version ?? 1;
   if (version > 1) {
-    throw new Error(`Manifest version ${version} is not supported — update claudesync`);
+    throw new Error(`Manifest version ${version} is not supported — update claudeport`);
   }
   return { version, paths: (data as Manifest).paths };
 }

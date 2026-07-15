@@ -41,7 +41,7 @@ async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }
   if (hasCommits) {
     throw new Error(
       `Remote is not empty but has no ${MANIFEST_FILE} — is this the right repo? ` +
-        'Point claudesync at an empty repo or an existing claudesync repo.',
+        'Point claudeport at an empty repo or an existing claudeport repo.',
     );
   }
 
@@ -51,7 +51,7 @@ async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }
     JSON.stringify(DEFAULT_MANIFEST, null, 2) + '\n',
   );
   const { copied } = syncFiles(claudeDir(), repoDir, DEFAULT_MANIFEST);
-  commitAll(repoDir, `claudesync init from ${os.hostname()}`);
+  commitAll(repoDir, `claudeport init from ${os.hostname()}`);
   git(['push', '-u', 'origin', 'HEAD'], repoDir);
   console.log(pc.green(`Initialized: ${copied.length} file(s) pushed.`));
 }

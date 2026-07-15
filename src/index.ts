@@ -4,7 +4,7 @@ import { Command } from 'commander';
 const program = new Command();
 
 program
-  .name('claudesync')
+  .name('claudeport')
   .description('Sync your Claude Code configuration across machines via your own git repo')
   .version('0.1.0');
 
@@ -54,7 +54,7 @@ program
 
 const config = program
   .command('config')
-  .description('view or change where claudesync reads config (env var > config file > default)');
+  .description('view or change where claudeport reads config (env var > config file > default)');
 
 config
   .command('set')

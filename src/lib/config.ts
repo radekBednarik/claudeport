@@ -17,7 +17,7 @@ function configDir(): string {
 
 /** Absolute path to the config file (may not exist yet). */
 export function configFilePath(): string {
-  return path.join(configDir(), 'claudesync', 'config.json');
+  return path.join(configDir(), 'claudeport', 'config.json');
 }
 
 /**

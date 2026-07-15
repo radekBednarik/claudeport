@@ -1,14 +1,14 @@
 {
-  "name": "claudesync",
+  "name": "claudeport",
   "version": "0.1.0",
   "description": "Sync your Claude Code configuration (settings, skills, agents, plugin selections) across machines via your own git repo",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/radekBednarik/claude-sync.git"
+    "url": "git+https://github.com/radekBednarik/claudeport.git"
   },
   "bin": {
-    "claudesync": "dist/index.js"
+    "claudeport": "dist/index.js"
   },
   "files": [
     "dist"

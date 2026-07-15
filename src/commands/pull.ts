@@ -16,7 +16,7 @@ export async function pull(opts: { yes?: boolean } = {}): Promise<ApplyResult> {
     } catch {
       throw new Error(
         `Your sync clone at ${repoDir} has diverged from the remote — ` +
-          'resolve it there with git (e.g. `git pull --rebase`), then re-run `claudesync pull`',
+          'resolve it there with git (e.g. `git pull --rebase`), then re-run `claudeport pull`',
       );
     }
   }

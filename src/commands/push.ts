@@ -14,7 +14,7 @@ export async function push(opts: { message?: string } = {}): Promise<void> {
   }
   const { behind } = aheadBehind(repoDir);
   if (behind > 0) {
-    throw new Error(`Sync repo is ${behind} commit(s) behind the remote — run \`claudesync pull\` first`);
+    throw new Error(`Sync repo is ${behind} commit(s) behind the remote — run \`claudeport pull\` first`);
   }
 
   const { copied, deleted } = syncFiles(claudeDir(), repoDir, manifest);

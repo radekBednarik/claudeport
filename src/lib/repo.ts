@@ -10,7 +10,7 @@ import { backupFiles, diffFiles, syncFiles, type FileDiff } from './files.js';
 export function openRepo(): { repoDir: string; manifest: Manifest } {
   const repoDir = syncDir();
   if (!fs.existsSync(path.join(repoDir, '.git'))) {
-    throw new Error(`No sync repo at ${repoDir} — run \`claudesync init <remote-url>\` first`);
+    throw new Error(`No sync repo at ${repoDir} — run \`claudeport init <remote-url>\` first`);
   }
   return { repoDir, manifest: loadManifest(repoDir) };
 }

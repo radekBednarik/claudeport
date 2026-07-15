@@ -9,7 +9,7 @@ const saved = { ...process.env };
 let tmp: string;
 
 beforeEach(() => {
-  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-paths-'));
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-paths-'));
   // Point the config file at an isolated, initially-empty dir.
   process.env.XDG_CONFIG_HOME = tmp;
   process.env.APPDATA = tmp;
@@ -30,13 +30,13 @@ test('claudeDir respects CLAUDE_CONFIG_DIR', () => {
   expect(claudeDir()).toBe('/tmp/fake-claude');
 });
 
-test('syncDir defaults to ~/.claude-sync', () => {
-  delete process.env.CLAUDESYNC_DIR;
-  expect(syncDir()).toBe(path.join(os.homedir(), '.claude-sync'));
+test('syncDir defaults to ~/.claudeport', () => {
+  delete process.env.CLAUDEPORT_DIR;
+  expect(syncDir()).toBe(path.join(os.homedir(), '.claudeport'));
 });
 
-test('syncDir respects CLAUDESYNC_DIR', () => {
-  process.env.CLAUDESYNC_DIR = '/tmp/fake-sync';
+test('syncDir respects CLAUDEPORT_DIR', () => {
+  process.env.CLAUDEPORT_DIR = '/tmp/fake-sync';
   expect(syncDir()).toBe('/tmp/fake-sync');
 });
 
@@ -47,7 +47,7 @@ test('claudeDir uses the config file when the env var is unset', () => {
 });
 
 test('syncDir uses the config file when the env var is unset', () => {
-  delete process.env.CLAUDESYNC_DIR;
+  delete process.env.CLAUDEPORT_DIR;
   writeConfig({ syncDir: '/from/config-sync' });
   expect(syncDir()).toBe('/from/config-sync');
 });

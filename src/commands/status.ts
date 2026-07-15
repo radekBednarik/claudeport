@@ -20,11 +20,11 @@ export async function status(): Promise<StatusResult> {
   const { ahead, behind } = aheadBehind(repoDir);
   const diff = diffFiles(claudeDir(), repoDir, manifest);
 
-  if (behind > 0) console.log(pc.yellow(`Repo is ${behind} commit(s) behind the remote — run \`claudesync pull\``));
+  if (behind > 0) console.log(pc.yellow(`Repo is ${behind} commit(s) behind the remote — run \`claudeport pull\``));
   if (ahead > 0) console.log(pc.yellow(`Repo is ${ahead} commit(s) ahead of the remote`));
   const dirty = diff.added.length + diff.changed.length + diff.removed.length;
   if (dirty > 0) {
-    console.log('Local changes not in the repo (`claudesync push` to sync):');
+    console.log('Local changes not in the repo (`claudeport push` to sync):');
     printDiff(diff, { added: '+ new', changed: '~ modified', removed: '- deleted locally' });
   }
   if (dirty === 0 && ahead === 0 && behind === 0) console.log(pc.green('Everything in sync.'));

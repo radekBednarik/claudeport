@@ -10,7 +10,7 @@ import {
 } from '../src/lib/manifest.js';
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-test-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-test-'));
 }
 
 test('default manifest covers the v1 sync surface', () => {
@@ -37,7 +37,7 @@ test('denylist blocks credentials and machine-local paths', () => {
 test('loadManifest reads a valid manifest', () => {
   const dir = tmpDir();
   fs.writeFileSync(
-    path.join(dir, 'claude-sync.json'),
+    path.join(dir, 'claudeport.json'),
     JSON.stringify({ version: 1, paths: ['settings.json'] }),
   );
   expect(loadManifest(dir)).toEqual({ version: 1, paths: ['settings.json'] });
@@ -46,7 +46,7 @@ test('loadManifest reads a valid manifest', () => {
 test('loadManifest rejects unsupported future versions', () => {
   const dir = tmpDir();
   fs.writeFileSync(
-    path.join(dir, 'claude-sync.json'),
+    path.join(dir, 'claudeport.json'),
     JSON.stringify({ version: 2, paths: ['settings.json'] }),
   );
   expect(() => loadManifest(dir)).toThrow(/version/i);
@@ -54,7 +54,7 @@ test('loadManifest rejects unsupported future versions', () => {
 
 test('loadManifest rejects garbage', () => {
   const dir = tmpDir();
-  fs.writeFileSync(path.join(dir, 'claude-sync.json'), '{"paths": "nope"}');
+  fs.writeFileSync(path.join(dir, 'claudeport.json'), '{"paths": "nope"}');
   expect(() => loadManifest(dir)).toThrow(/manifest/i);
 });
 

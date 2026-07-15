@@ -78,7 +78,7 @@ export function syncFiles(
 /** Copy the given files from baseDir into a new timestamped dir under backupRoot. */
 export function backupFiles(baseDir: string, relPaths: string[], backupRoot: string): string {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupDir = path.join(backupRoot, `claude-sync-${stamp}`);
+  const backupDir = path.join(backupRoot, `claudeport-${stamp}`);
   for (const rel of relPaths) {
     const src = safeJoin(baseDir, rel);
     if (!fs.existsSync(src)) continue;

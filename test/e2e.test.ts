@@ -10,12 +10,12 @@ import { status } from '../src/commands/status.js';
 import { diff } from '../src/commands/diff.js';
 
 // Two fake machines (A = workstation, B = notebook) sharing a local bare repo.
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-e2e-'));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-e2e-'));
 const remote = path.join(root, 'remote.git');
 execFileSync('git', ['init', '--bare', '-b', 'main', remote]);
 
-const A = { claude: path.join(root, 'a/.claude'), sync: path.join(root, 'a/.claude-sync') };
-const B = { claude: path.join(root, 'b/.claude'), sync: path.join(root, 'b/.claude-sync') };
+const A = { claude: path.join(root, 'a/.claude'), sync: path.join(root, 'a/.claudeport') };
+const B = { claude: path.join(root, 'b/.claude'), sync: path.join(root, 'b/.claudeport') };
 fs.mkdirSync(A.claude, { recursive: true });
 fs.mkdirSync(B.claude, { recursive: true });
 
@@ -28,7 +28,7 @@ Object.assign(process.env, {
 
 function on(machine: { claude: string; sync: string }): void {
   process.env.CLAUDE_CONFIG_DIR = machine.claude;
-  process.env.CLAUDESYNC_DIR = machine.sync;
+  process.env.CLAUDEPORT_DIR = machine.sync;
 }
 
 function write(base: string, rel: string, content: string): void {
@@ -54,7 +54,7 @@ test('init on machine A seeds an empty remote, never leaking secrets', async () 
   on(A);
   await init(remote);
 
-  expect(fs.existsSync(path.join(A.sync, 'claude-sync.json'))).toBe(true);
+  expect(fs.existsSync(path.join(A.sync, 'claudeport.json'))).toBe(true);
   expect(read(A.sync, 'settings.json')).toBe('{"model":"opus"}');
   expect(read(A.sync, 'skills/foo/SKILL.md')).toBe('foo skill');
   expect(fs.existsSync(path.join(A.sync, '.credentials.json'))).toBe(false);

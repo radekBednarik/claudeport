@@ -6,7 +6,7 @@ import { isDenied, resolveFiles } from '../src/lib/manifest.js';
 import { syncFiles } from '../src/lib/files.js';
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-sec-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-sec-'));
 }
 
 function seed(dir: string, files: Record<string, string>): void {
@@ -37,11 +37,11 @@ test('resolveFiles ignores ../ traversal entries', () => {
 test('resolveFiles ignores absolute path entries', () => {
   const base = tmpDir();
   seed(base, { 'settings.json': '{}' });
-  fs.writeFileSync('/tmp/claudesync-sec-absolute.txt', 'x');
+  fs.writeFileSync('/tmp/claudeport-sec-absolute.txt', 'x');
 
   const files = resolveFiles(base, {
     version: 1,
-    paths: ['settings.json', '/tmp/claudesync-sec-absolute.txt', '/etc/hostname'],
+    paths: ['settings.json', '/tmp/claudeport-sec-absolute.txt', '/etc/hostname'],
   });
 
   expect(files).toEqual(['settings.json']);

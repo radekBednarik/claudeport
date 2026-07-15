@@ -1,4 +1,4 @@
-# Publishing `claudesync`
+# Publishing `claudeport`
 
 This package publishes to npm using **Trusted Publishing (OIDC)** — GitHub Actions
 authenticates to npm with a short-lived token minted per run. **No `NPM_TOKEN` is
@@ -19,23 +19,23 @@ Once done, **D is the entire release process, forever.**
 npm won't let you configure a trusted publisher for a package that doesn't exist yet,
 so publish the first version manually from your machine using your own npm login (2FA).
 
-1. Check the name is free: `npm view claudesync` → a `404` means it's available.
+1. Check the name is free: `npm view claudeport` → a `404` means it's available.
 2. Enable 2FA on your npm account, then `npm login`.
 3. Upgrade local npm: `npm install -g npm@latest` (need ≥ 11.5.1).
 4. From a clean checkout of `main`: `pnpm install`, then `npm publish`.
    - The `prepublishOnly` hook auto-runs `pnpm build && pnpm test`. Enter your 2FA OTP if prompted.
    - This bootstrap publish has **no provenance** (provenance needs CI OIDC) — that's expected.
-5. Confirm: `npm view claudesync version` → `0.1.0`.
+5. Confirm: `npm view claudeport version` → `0.1.0`.
 
 ## B. Configure the trusted publisher on npmjs.com (package now exists)
 
-1. Go to `https://www.npmjs.com/package/claudesync/access` →
+1. Go to `https://www.npmjs.com/package/claudeport/access` →
    **Trusted Publisher** → Add → **GitHub Actions**.
 2. Enter these values **exactly** (case-sensitive):
    | Field                 | Value                                                    |
    | --------------------- | -------------------------------------------------------- |
    | Organization or user  | `radekBednarik`                                          |
-   | Repository            | `claude-sync`                                            |
+   | Repository            | `claudeport`                                            |
    | Workflow filename     | `release.yml` &nbsp;(filename only — **not** the path)   |
    | Environment           | `npm-publish`                                            |
    | Allowed action        | `npm publish`                                            |
@@ -43,7 +43,7 @@ so publish the first version manually from your machine using your own npm login
 
 ## C. GitHub repo setup
 
-1. Confirm `radekBednarik/claude-sync` is **public** (required for provenance to be generated).
+1. Confirm `radekBednarik/claudeport` is **public** (required for provenance to be generated).
 2. **Settings → Environments → New environment** → name it `npm-publish` → add
    **yourself as a Required reviewer** (optionally limit deployment branches to `main`).
    The name must match step B exactly.
@@ -69,7 +69,7 @@ so publish the first version manually from your machine using your own npm login
    Open the run in the **Actions** tab and click **Approve**.
 4. It publishes to npm via OIDC, with provenance attached.
 
-**Verify:** `npm view claudesync version` shows the new version, and the package page on
+**Verify:** `npm view claudeport version` shows the new version, and the package page on
 npmjs.com shows a **provenance / "Published via GitHub Actions"** badge.
 
 ## References

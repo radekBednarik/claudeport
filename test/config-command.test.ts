@@ -10,7 +10,7 @@ let tmp: string;
 let logs: string[];
 
 beforeEach(() => {
-  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'claudesync-cmd-'));
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'claudeport-cmd-'));
   process.env.XDG_CONFIG_HOME = tmp;
   process.env.APPDATA = tmp;
   logs = [];
