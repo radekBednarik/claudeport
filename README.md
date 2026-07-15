@@ -128,6 +128,34 @@ Run the tests with `pnpm test` (or `pnpm test:watch`). When you're done, remove 
 npm unlink -g claudeport
 ```
 
+### Local two-machine testing
+
+You can simulate two machines syncing through a repo on a single box, using two terminals and a
+throwaway local git "remote" — without touching your real `~/.claude`. A sandbox under
+`.local-test/` (gitignored) holds a bare `remote.git` plus isolated config/clone dirs for each
+simulated machine; environment variables redirect the CLI into it.
+
+```sh
+pnpm test:local:setup        # builds the CLI, creates .local-test/ with a seeded machine A
+
+# Terminal 1 — machine A (the "workstation")
+source scripts/local-test-env.sh a
+claudeport init "$CLAUDEPORT_TEST_REMOTE"    # seeds the remote from A's config, pushes
+
+# Terminal 2 — machine B (the "notebook")
+source scripts/local-test-env.sh b
+claudeport init "$CLAUDEPORT_TEST_REMOTE"    # clones the populated remote, applies it to B
+```
+
+Now iterate: edit files under `.local-test/machineA/.claude`, then `claudeport push` in
+terminal A and `claudeport pull` in terminal B. `claudeport status` and `claudeport diff` work
+on either side. Sourcing the env script also defines a `claudeport` shell function that runs
+`node dist/index.js`, so rebuild with `pnpm build` (or keep `pnpm build:watch` running) to pick
+up code changes.
+
+Reset the sandbox to a clean seeded state with `pnpm test:local:reset`, and remove it entirely
+with `pnpm test:local:teardown`.
+
 ## License
 
 MIT
