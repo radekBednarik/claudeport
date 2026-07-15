@@ -1,18 +1,18 @@
-import pc from 'picocolors';
 import { aheadBehind, git } from '../lib/git.js';
 import { loadManifest } from '../lib/manifest.js';
 import { type ApplyResult, applyRepoToLocal, openRepo } from '../lib/repo.js';
+import { withSpinner } from '../lib/ui.js';
 
 export async function pull(opts: { yes?: boolean } = {}): Promise<ApplyResult> {
   const { repoDir } = openRepo();
-  try {
-    git(['fetch'], repoDir);
-  } catch {
-    console.error(pc.yellow('warning: could not reach the remote, applying last fetched state'));
-  }
-  if (aheadBehind(repoDir).behind > 0) {
+  await withSpinner('Fetching from remote', () => git(['fetch'], repoDir), {
+    warnOnError: 'could not reach the remote, applying last fetched state',
+  });
+  if ((await aheadBehind(repoDir)).behind > 0) {
     try {
-      git(['merge', '--ff-only', '@{upstream}'], repoDir);
+      await withSpinner('Merging remote changes', () =>
+        git(['merge', '--ff-only', '@{upstream}'], repoDir),
+      );
     } catch {
       throw new Error(
         `Your sync clone at ${repoDir} has diverged from the remote — ` +

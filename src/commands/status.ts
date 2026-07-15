@@ -3,6 +3,7 @@ import { diffFiles, type FileDiff } from '../lib/files.js';
 import { aheadBehind, git } from '../lib/git.js';
 import { claudeDir } from '../lib/paths.js';
 import { openRepo, printDiff } from '../lib/repo.js';
+import { withSpinner } from '../lib/ui.js';
 
 export interface StatusResult {
   ahead: number;
@@ -12,12 +13,10 @@ export interface StatusResult {
 
 export async function status(): Promise<StatusResult> {
   const { repoDir, manifest } = openRepo();
-  try {
-    git(['fetch'], repoDir);
-  } catch {
-    console.error(pc.yellow('warning: could not reach the remote, showing offline status'));
-  }
-  const { ahead, behind } = aheadBehind(repoDir);
+  await withSpinner('Checking remote', () => git(['fetch'], repoDir), {
+    warnOnError: 'could not reach the remote, showing offline status',
+  });
+  const { ahead, behind } = await aheadBehind(repoDir);
   const diff = diffFiles(claudeDir(), repoDir, manifest);
 
   if (behind > 0)

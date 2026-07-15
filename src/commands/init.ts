@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import pc from 'picocolors';
 import { syncFiles } from '../lib/files.js';
 import { commitAll, git } from '../lib/git.js';
 import { DEFAULT_MANIFEST, loadManifest, MANIFEST_FILE } from '../lib/manifest.js';
 import { claudeDir, syncDir } from '../lib/paths.js';
 import { applyRepoToLocal } from '../lib/repo.js';
+import { withSpinner } from '../lib/ui.js';
 
 export async function init(remoteUrl: string, opts: { yes?: boolean } = {}): Promise<void> {
   const repoDir = syncDir();
@@ -16,7 +16,15 @@ export async function init(remoteUrl: string, opts: { yes?: boolean } = {}): Pro
   fs.mkdirSync(path.dirname(repoDir), { recursive: true });
   // `--` stops remoteUrl being parsed as an option; disabling the ext transport
   // blocks `ext::sh -c '…'` URLs that would run arbitrary local shell on clone.
-  git(['clone', '-c', 'protocol.ext.allow=never', '--', remoteUrl, repoDir], path.dirname(repoDir));
+  await withSpinner(
+    'Cloning config repo',
+    () =>
+      git(
+        ['clone', '-c', 'protocol.ext.allow=never', '--', remoteUrl, repoDir],
+        path.dirname(repoDir),
+      ),
+    { done: 'Cloned config repo' },
+  );
   try {
     await setup(repoDir, remoteUrl, opts);
   } catch (err) {
@@ -34,7 +42,7 @@ async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }
 
   let hasCommits = true;
   try {
-    git(['rev-parse', 'HEAD'], repoDir);
+    await git(['rev-parse', 'HEAD'], repoDir);
   } catch {
     hasCommits = false;
   }
@@ -51,7 +59,8 @@ async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }
     `${JSON.stringify(DEFAULT_MANIFEST, null, 2)}\n`,
   );
   const { copied } = syncFiles(claudeDir(), repoDir, DEFAULT_MANIFEST);
-  commitAll(repoDir, `claudeport init from ${os.hostname()}`);
-  git(['push', '-u', 'origin', 'HEAD'], repoDir);
-  console.log(pc.green(`Initialized: ${copied.length} file(s) pushed.`));
+  await commitAll(repoDir, `claudeport init from ${os.hostname()}`);
+  await withSpinner('Pushing to remote', () => git(['push', '-u', 'origin', 'HEAD'], repoDir), {
+    done: `Initialized: ${copied.length} file(s) pushed`,
+  });
 }
