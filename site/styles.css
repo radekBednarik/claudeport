@@ -70,7 +70,8 @@ p code, li code, td code, h3 code {
   border-radius: 6px;
   padding: 0.08em 0.4em;
   color: var(--ink);
-  white-space: nowrap;
+  /* short tokens stay intact; long paths break instead of overflowing the card */
+  overflow-wrap: anywhere;
 }
 
 /* ---------- atmospheric layers ---------- */
