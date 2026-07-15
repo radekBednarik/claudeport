@@ -87,6 +87,29 @@ Your repo is cloned to `~/.claude-sync`. `push` copies manifest-tracked files fr
 
 MCP server configs (they often embed secrets and machine-specific paths), per-machine setting overrides, and project-level `.claude/` dirs are deliberately out of scope for v1.
 
+## Development
+
+Run the real `claudesync` command straight from a checkout, instead of `node dist/index.js`:
+
+```sh
+pnpm install
+pnpm build          # compile src/ -> dist/ (the linked command runs the build output)
+npm link            # symlink `claudesync` onto your PATH, pointing at this repo's dist/
+```
+
+Now `claudesync <cmd>` works from any directory and reflects your local code. While iterating, keep
+a rebuild running in a second terminal so edits go live on save:
+
+```sh
+pnpm build:watch    # tsc --watch; recompiles into dist/ on every change
+```
+
+Run the tests with `pnpm test` (or `pnpm test:watch`). When you're done, remove the global link:
+
+```sh
+npm unlink -g claudesync
+```
+
 ## License
 
 MIT
