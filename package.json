@@ -7,6 +7,7 @@
     "type": "git",
     "url": "git+https://github.com/radekBednarik/claudeport.git"
   },
+  "homepage": "https://radekbednarik.github.io/claudeport/",
   "bin": {
     "claudeport": "dist/index.js"
   },

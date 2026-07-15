@@ -1,0 +1,38 @@
+name: Deploy Pages
+
+on:
+  workflow_dispatch: # manual "Run workflow" button
+  workflow_run:
+    workflows: [Release] # must match release.yml's `name: Release`
+    types: [completed]
+
+# Least-privilege token, plus what the Pages deployment needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; let an in-flight deploy finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Manual runs always deploy. Release-triggered runs deploy ONLY when the
+    # Release workflow actually succeeded (npm publish passed).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site # static, build-free — the site/ dir is uploaded verbatim
+      - id: deploy
+        uses: actions/deploy-pages@v4
