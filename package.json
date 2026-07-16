@@ -1,6 +1,6 @@
 {
   "name": "claudeport",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Sync your Claude Code configuration (settings, skills, agents, plugin selections) across machines via your own git repo",
   "type": "module",
   "repository": {
