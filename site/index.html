@@ -205,6 +205,7 @@
           <button class="key" type="button" data-flow="pull">pull</button>
           <button class="key" type="button" data-flow="status">status</button>
           <button class="key" type="button" data-flow="diff">diff</button>
+          <button class="key" type="button" data-flow="manifest">manifest</button>
           <button class="key" type="button" data-flow="config">config</button>
         </div>
         <figcaption id="topo-cap" class="topo__cap">
@@ -298,6 +299,12 @@
           <span class="cmd__flow cmd__flow--query">read-only</span>
         </button>
 
+        <button class="cmd" type="button" data-flow="manifest" aria-describedby="topo-cap">
+          <div class="cmd__row"><code class="cmd__name">manifest</code></div>
+          <p class="cmd__desc">Interactively pick which <code>~/.claude</code> paths sync — whole folders or individual files — and write the repo's <code>claudeport.json</code> for you. Then <code>push</code>.</p>
+          <span class="cmd__flow cmd__flow--local">edits the manifest</span>
+        </button>
+
         <button class="cmd" type="button" data-flow="config" aria-describedby="topo-cap">
           <div class="cmd__row"><code class="cmd__name">config</code><span class="cmd__args">set · get · unset · path</span></div>
           <p class="cmd__desc">Override where your config lives (<code>claude-dir</code>) or where the repo clones (<code>sync-dir</code>). Local machine only.</p>
@@ -311,12 +318,23 @@
       <div class="band__head" data-reveal>
         <span class="kicker">03 — What travels</span>
         <h2 id="sync-title">A manifest decides. A denylist overrules.</h2>
+        <p class="band__intro">Run <code>claudeport manifest</code> to pick paths interactively — no hand-editing JSON — or edit the file directly. Either way, the same <code>claudeport.json</code> travels in your repo.</p>
       </div>
 
       <div class="gate">
         <div class="gate__col gate__col--pass" data-reveal>
           <h3 class="gate__label"><span class="tick" aria-hidden="true">→</span> What syncs</h3>
-          <p class="gate__note">The repo's <code>claudeport.json</code> lists paths (relative to <code>~/.claude</code>). Edit &amp; push to change it everywhere.</p>
+          <p class="gate__note">The repo's <code>claudeport.json</code> lists paths (relative to <code>~/.claude</code>). Edit it interactively, or by hand, then push to change it everywhere.</p>
+          <div class="snippet snippet--multi">
+            <pre><code><span class="c-prompt">$</span> claudeport manifest   <span class="c-note"># interactive picker</span>
+
+<span class="c-flow-pull">[x]</span> settings.json
+<span class="c-flow-pull">[x]</span> skills<span class="c-note">/</span>
+<span class="c-flow-partial">[~]</span> agents<span class="c-note"> (2 file(s))</span>
+<span class="c-note">[ ]</span> keybindings.json
+<span class="c-note">↑/↓ move · space toggle · enter save · esc cancel</span></code></pre>
+            <button class="copy" type="button" data-copy="claudeport manifest" aria-label="Copy command"><span class="copy__label">Copy</span></button>
+          </div>
           <div class="snippet snippet--multi snippet--json">
             <pre><code>{
   <span class="j-key">"version"</span>: <span class="j-num">1</span>,
@@ -352,16 +370,25 @@
           <h3 class="gate__label"><span class="cross" aria-hidden="true">×</span> What never syncs</h3>
           <p class="gate__note">A hardcoded denylist wins over the manifest — even if you add these, they stay put.</p>
           <ul class="chips">
-            <li>.credentials.json</li>
             <li>*credentials*</li>
             <li>*.pem</li>
             <li>*.key</li>
-            <li>history</li>
+            <li>history.jsonl</li>
+            <li>policy-limits.json</li>
+            <li>remote-settings.json</li>
             <li>projects</li>
             <li>sessions</li>
-            <li>caches</li>
+            <li>session-env</li>
+            <li>file-history</li>
+            <li>shell-snapshots</li>
+            <li>cache</li>
+            <li>paste-cache</li>
+            <li>plugins/cache</li>
             <li>telemetry</li>
             <li>backups</li>
+            <li>security</li>
+            <li>downloads</li>
+            <li>todos</li>
           </ul>
           <p class="gate__fine">Secrets, machine-local state and noise can't leak into your repo by accident.</p>
         </div>

@@ -59,9 +59,10 @@
       init:   { lanes: [...pushLanes, ...pullLanes], pkts: ["push", "pull"], nodes: ["ws", "repo", "nb"] },
       push:   { lanes: pushLanes, pkts: ["push"], nodes: ["ws", "repo", "nb"] },
       pull:   { lanes: pullLanes, pkts: ["pull"], nodes: ["ws", "repo", "nb"] },
-      status: { pulse: ["ws", "repo", "nb"] },
-      diff:   { pulse: ["ws", "repo", "nb"] },
-      config: { pulse: ["ws", "nb"] },
+      status:   { pulse: ["ws", "repo", "nb"] },
+      diff:     { pulse: ["ws", "repo", "nb"] },
+      manifest: { pulse: ["ws", "repo"] },
+      config:   { pulse: ["ws", "nb"] },
     };
 
     function clear() {

@@ -57,11 +57,23 @@ The repo contains a `claudeport.json` manifest listing what to sync (relative to
 }
 ```
 
-Edit it (and push) to change what syncs everywhere. Plugin *code* is never synced — only your selections travel. After a pull that changes plugins, restart Claude Code; if a plugin appears missing, reinstall it via `/plugin`.
+Edit it by hand (and push) to change what syncs everywhere, or run the interactive picker:
+
+```sh
+claudeport manifest   # choose paths — whole folders or individual files — then push
+```
+
+`manifest` discovers your top-level `~/.claude` entries, lets you toggle each one (whole folder, specific files, or off), and writes `claudeport.json` for you. Denied paths never appear. Run `claudeport push` afterwards to sync the change.
+
+Plugin *code* is never synced — only your selections travel. After a pull that changes plugins, restart Claude Code; if a plugin appears missing, reinstall it via `/plugin`.
 
 ## What never syncs
 
-A hardcoded denylist wins over the manifest. Credentials (`.credentials.json`, anything matching `*credentials*`, `*.pem`, `*.key`), history, projects, sessions, caches, telemetry, and backups **cannot** be synced even if you add them to the manifest.
+A hardcoded denylist wins over the manifest, and these **cannot** be synced even if you add them to the manifest:
+
+- **Secrets** — anything matching `*credentials*`, `*.pem`, or `*.key`.
+- **Machine-local state & noise** — the `projects`, `sessions`, `session-env`, `file-history`, `shell-snapshots`, `cache`, `paste-cache`, `plugins/cache`, `telemetry`, `backups`, `security`, `downloads`, and `todos` directories.
+- **Volatile files** — `history.jsonl`, `policy-limits.json`, and `remote-settings.json`.
 
 ## Safety
 

@@ -199,6 +199,8 @@ p code, li code, td code, h3 code {
 
 .c-prompt { color: var(--accent); }
 .c-note { color: var(--ink-faint); }
+.c-flow-pull { color: var(--pull); }
+.c-flow-partial { color: var(--push-soft); }
 .j-key { color: var(--pull-soft); }
 .j-str { color: var(--push-soft); }
 .j-num { color: #c8a2ff; }
