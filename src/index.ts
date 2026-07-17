@@ -6,7 +6,7 @@ const program = new Command();
 program
   .name('claudeport')
   .description('Sync your Claude Code configuration across machines via your own git repo')
-  .version('0.2.0');
+  .version('0.3.0');
 
 program
   .command('init')
