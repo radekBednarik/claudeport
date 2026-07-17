@@ -52,6 +52,14 @@ program
     await diff();
   });
 
+program
+  .command('manifest')
+  .description('interactively choose which .claude paths to sync')
+  .action(async () => {
+    const { manifest } = await import('./commands/manifest.js');
+    await manifest();
+  });
+
 const config = program
   .command('config')
   .description('view or change where claudeport reads config (env var > config file > default)');

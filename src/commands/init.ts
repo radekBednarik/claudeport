@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { syncFiles } from '../lib/files.js';
 import { commitAll, git } from '../lib/git.js';
-import { DEFAULT_MANIFEST, loadManifest, MANIFEST_FILE } from '../lib/manifest.js';
+import { DEFAULT_MANIFEST, loadManifest, MANIFEST_FILE, saveManifest } from '../lib/manifest.js';
 import { claudeDir, syncDir } from '../lib/paths.js';
 import { applyRepoToLocal } from '../lib/repo.js';
 import { withSpinner } from '../lib/ui.js';
@@ -54,10 +54,7 @@ async function setup(repoDir: string, remoteUrl: string, opts: { yes?: boolean }
   }
 
   console.log(`Seeding ${remoteUrl} from ${claudeDir()} …`);
-  fs.writeFileSync(
-    path.join(repoDir, MANIFEST_FILE),
-    `${JSON.stringify(DEFAULT_MANIFEST, null, 2)}\n`,
-  );
+  saveManifest(repoDir, DEFAULT_MANIFEST);
   const { copied } = syncFiles(claudeDir(), repoDir, DEFAULT_MANIFEST);
   await commitAll(repoDir, `claudeport init from ${os.hostname()}`);
   await withSpinner('Pushing to remote', () => git(['push', '-u', 'origin', 'HEAD'], repoDir), {

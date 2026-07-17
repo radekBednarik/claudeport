@@ -61,6 +61,44 @@ export function isDenied(relPath: string): boolean {
   return false;
 }
 
+export function saveManifest(repoDir: string, manifest: Manifest): void {
+  fs.writeFileSync(path.join(repoDir, MANIFEST_FILE), `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
+export interface DiscoveredEntry {
+  name: string;
+  type: 'file' | 'dir';
+}
+
+/** Top-level entries of baseDir (files and dirs), minus denied ones and symlinks,
+ *  sorted by name. Returns [] if baseDir does not exist. */
+export function listTopLevelEntries(baseDir: string): DiscoveredEntry[] {
+  if (!fs.existsSync(baseDir)) return [];
+  const out: DiscoveredEntry[] = [];
+  for (const entry of fs.readdirSync(baseDir, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) continue;
+    if (isDenied(entry.name)) continue;
+    if (entry.isDirectory()) out.push({ name: entry.name, type: 'dir' });
+    else if (entry.isFile()) out.push({ name: entry.name, type: 'file' });
+  }
+  return out.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+}
+
+/** Flattened, non-denied files under a top-level folder, as folder-relative POSIX
+ *  paths, sorted. Returns [] if the folder is missing or not a directory. */
+export function listFolderFiles(baseDir: string, folder: string): string[] {
+  const abs = path.join(baseDir, folder);
+  if (!fs.existsSync(abs) || !fs.statSync(abs).isDirectory()) return [];
+  const out: string[] = [];
+  walk(abs, baseDir, out);
+  const prefix = `${folder}/`;
+  return posixAllowed(out)
+    .filter((p) => p.startsWith(prefix))
+    .map((p) => p.slice(prefix.length))
+    .filter((p) => p.length > 0)
+    .sort();
+}
+
 export function loadManifest(repoDir: string): Manifest {
   const raw = fs.readFileSync(path.join(repoDir, MANIFEST_FILE), 'utf8');
   const data: unknown = JSON.parse(raw);
@@ -77,6 +115,12 @@ export function loadManifest(repoDir: string): Manifest {
     throw new Error(`Manifest version ${version} is not supported — update claudeport`);
   }
   return { version, paths: (data as Manifest).paths };
+}
+
+/** Convert walk() output (OS-separated, baseDir-relative) to POSIX paths and
+ *  drop anything the denylist rejects. */
+function posixAllowed(paths: string[]): string[] {
+  return paths.map((p) => p.split(path.sep).join('/')).filter((p) => !isDenied(p));
 }
 
 function walk(dir: string, base: string, out: string[]): void {
@@ -104,8 +148,5 @@ export function resolveFiles(baseDir: string, manifest: Manifest): string[] {
     if (stat.isDirectory()) walk(abs, baseDir, out);
     else if (stat.isFile()) out.push(rel);
   }
-  return [...new Set(out)]
-    .map((p) => p.split(path.sep).join('/'))
-    .filter((p) => !isDenied(p))
-    .sort();
+  return [...new Set(posixAllowed(out))].sort();
 }
