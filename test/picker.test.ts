@@ -14,6 +14,7 @@ import {
   type PickerModel,
   reduce,
   stateToPaths,
+  visibleWindow,
 } from '../src/lib/picker.js';
 
 function tmpDir(): string {
@@ -229,6 +230,33 @@ test('down on an empty list keeps the cursor at 0, save yields no paths', () => 
   const after = press(model, DOWN, DOWN);
   expect(after.cursor).toBe(0);
   expect(stateToPaths(press(after, ENTER))).toEqual([]);
+});
+
+// ── visibleWindow (scrolling viewport) ───────────────────────────────────────
+
+test('visibleWindow shows everything when the list fits', () => {
+  expect(visibleWindow(5, 0, 10)).toEqual({ start: 0, end: 5 });
+  expect(visibleWindow(5, 4, 5)).toEqual({ start: 0, end: 5 });
+  expect(visibleWindow(0, 0, 10)).toEqual({ start: 0, end: 0 });
+});
+
+test('visibleWindow keeps the cursor within the window and clamps at both ends', () => {
+  const count = 100;
+  const height = 10;
+  for (const cursor of [0, 1, 5, 50, 94, 95, 99]) {
+    const { start, end } = visibleWindow(count, cursor, height);
+    expect(end - start).toBe(height); // always a full window when scrolling
+    expect(cursor).toBeGreaterThanOrEqual(start);
+    expect(cursor).toBeLessThan(end);
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeLessThanOrEqual(count);
+  }
+  expect(visibleWindow(100, 0, 10).start).toBe(0); // clamped at top
+  expect(visibleWindow(100, 99, 10)).toEqual({ start: 90, end: 100 }); // clamped at bottom
+});
+
+test('visibleWindow degrades safely for a zero/negative height', () => {
+  expect(visibleWindow(5, 2, 0)).toEqual({ start: 0, end: 5 });
 });
 
 // ── discovery helpers ─────────────────────────────────────────────────────────

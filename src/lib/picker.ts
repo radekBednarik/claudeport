@@ -238,7 +238,11 @@ export function stateToPaths(model: PickerModel): string[] {
 
 const HIDE_CURSOR = '\x1b[?25l';
 const SHOW_CURSOR = '\x1b[?25h';
-const CLEAR = '\x1b[2J\x1b[H';
+const ALT_ENTER = '\x1b[?1049h'; // switch to the alternate screen buffer
+const ALT_EXIT = '\x1b[?1049l'; // restore the normal buffer on exit
+const HOME = '\x1b[H'; // cursor to top-left
+const CLEAR_EOL = '\x1b[K'; // erase to end of line
+const CLEAR_BELOW = '\x1b[J'; // erase from cursor to end of screen
 
 function glyph(entry: PickerEntry): string {
   if (entry.type === 'file') return entry.state === 'off' ? '[ ]' : '[x]';
@@ -256,35 +260,85 @@ function label(entry: PickerEntry): string {
   return `${entry.name}${suffix}`;
 }
 
-function render(model: PickerModel): void {
-  const lines: string[] = [];
+/** Choose the slice of `count` list rows to show in `height` lines, keeping the
+ *  cursor row visible (roughly centered, clamped at both ends). */
+export function visibleWindow(
+  count: number,
+  cursor: number,
+  height: number,
+): { start: number; end: number } {
+  if (height <= 0 || count <= height) return { start: 0, end: count };
+  const start = Math.max(0, Math.min(cursor - Math.floor(height / 2), count - height));
+  return { start, end: start + height };
+}
+
+/** Repaint in place on the alternate screen: home the cursor, clear each line
+ *  to its end as we overwrite it, then clear anything left below. No full-screen
+ *  erase, so the redraw does not flicker. */
+function paint(lines: string[]): void {
+  const body = lines.map((line) => `${line}${CLEAR_EOL}`).join('\n');
+  process.stdout.write(`${HOME}${body}${CLEAR_BELOW}`);
+}
+
+/** Build header, selectable rows (with the active cursor), and footer for the
+ *  current view. Windowing/painting is applied by render(). */
+function viewLines(model: PickerModel): {
+  header: string[];
+  rows: string[];
+  cursor: number;
+  footer: string[];
+} {
   if (model.view === 'top') {
-    lines.push(pc.bold('Select paths to sync'), '');
-    model.entries.forEach((entry, i) => {
+    const rows = model.entries.map((entry, i) => {
       const pointer = i === model.cursor ? pc.cyan('❯') : ' ';
-      lines.push(`${pointer} ${glyph(entry)} ${label(entry)}`);
+      return `${pointer} ${glyph(entry)} ${label(entry)}`;
     });
-    lines.push('', pc.dim('↑/↓ move · space toggle · enter save · esc cancel'));
-  } else {
-    const entry = model.activeFolder === null ? undefined : model.entries[model.activeFolder];
-    if (model.view === 'folder-choice' && entry) {
-      lines.push(pc.bold(`${entry.name}/`), '');
-      ['Whole folder', 'Pick specific files'].forEach((opt, i) => {
-        const pointer = i === model.subCursor ? pc.cyan('❯') : ' ';
-        lines.push(`${pointer} ${opt}`);
-      });
-      lines.push('', pc.dim('↑/↓ move · enter choose · esc back'));
-    } else if (entry) {
-      lines.push(pc.bold(`${entry.name}/ — pick files`), '');
-      if (entry.children.length === 0) lines.push(pc.dim('  (no files found)'));
-      entry.children.forEach((child, i) => {
-        const pointer = i === model.subCursor ? pc.cyan('❯') : ' ';
-        lines.push(`${pointer} ${child.checked ? '[x]' : '[ ]'} ${child.relPath}`);
-      });
-      lines.push('', pc.dim('↑/↓ move · space toggle · enter done · esc back'));
-    }
+    return {
+      header: [pc.bold('Select paths to sync'), ''],
+      rows,
+      cursor: model.cursor,
+      footer: ['', pc.dim('↑/↓ move · space toggle · enter save · esc cancel')],
+    };
   }
-  process.stdout.write(`${CLEAR}${lines.join('\n')}\n`);
+  const entry = model.activeFolder === null ? undefined : model.entries[model.activeFolder];
+  if (model.view === 'folder-choice' && entry) {
+    const rows = ['Whole folder', 'Pick specific files'].map(
+      (opt, i) => `${i === model.subCursor ? pc.cyan('❯') : ' '} ${opt}`,
+    );
+    return {
+      header: [pc.bold(`${entry.name}/`), ''],
+      rows,
+      cursor: model.subCursor,
+      footer: ['', pc.dim('↑/↓ move · enter choose · esc back')],
+    };
+  }
+  if (entry) {
+    const rows =
+      entry.children.length === 0
+        ? [pc.dim('  (no files found)')]
+        : entry.children.map(
+            (child, i) =>
+              `${i === model.subCursor ? pc.cyan('❯') : ' '} ${child.checked ? '[x]' : '[ ]'} ${child.relPath}`,
+          );
+    return {
+      header: [pc.bold(`${entry.name}/ — pick files`), ''],
+      rows,
+      cursor: model.subCursor,
+      footer: ['', pc.dim('↑/↓ move · space toggle · enter done · esc back')],
+    };
+  }
+  return { header: [], rows: [], cursor: 0, footer: [] };
+}
+
+function render(model: PickerModel): void {
+  const { header, rows, cursor, footer } = viewLines(model);
+  // Reserve terminal rows for the header, footer, and the two scroll markers.
+  const termRows = process.stdout.rows ?? 24;
+  const budget = Math.max(1, termRows - header.length - footer.length - 2);
+  const { start, end } = visibleWindow(rows.length, cursor, budget);
+  const above = start > 0 ? pc.dim(`  ↑ ${start} more`) : '';
+  const below = end < rows.length ? pc.dim(`  ↓ ${rows.length - end} more`) : '';
+  paint([...header, above, ...rows.slice(start, end), below, ...footer]);
 }
 
 /** Run the interactive picker. Returns the final model on save, or null on
@@ -302,7 +356,7 @@ export function runPicker(initial: PickerModel): Promise<PickerModel | null> {
       input.removeListener('keypress', onKey);
       input.setRawMode(false);
       input.pause();
-      process.stdout.write(SHOW_CURSOR);
+      process.stdout.write(`${SHOW_CURSOR}${ALT_EXIT}`);
     };
     const onKey = (_str: string, key: KeyEvent | undefined): void => {
       try {
@@ -326,7 +380,7 @@ export function runPicker(initial: PickerModel): Promise<PickerModel | null> {
     readline.emitKeypressEvents(input);
     input.setRawMode(true);
     input.resume();
-    process.stdout.write(HIDE_CURSOR);
+    process.stdout.write(`${ALT_ENTER}${HIDE_CURSOR}`);
     render(model);
     input.on('keypress', onKey);
   });
