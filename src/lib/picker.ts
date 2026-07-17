@@ -244,20 +244,40 @@ const HOME = '\x1b[H'; // cursor to top-left
 const CLEAR_EOL = '\x1b[K'; // erase to end of line
 const CLEAR_BELOW = '\x1b[J'; // erase from cursor to end of screen
 
-function glyph(entry: PickerEntry): string {
-  if (entry.type === 'file') return entry.state === 'off' ? '[ ]' : '[x]';
-  if (entry.state === 'whole') return '[x]';
-  if (entry.state === 'partial') return '[~]';
-  return '[ ]';
+/** Muted styling for the "off"/secondary bits of a row. Skipped on the active
+ *  row: bold already sets it apart, and dim shares picocolors' reset code with
+ *  bold (\x1b[22m), so a dim fragment inside a bolded line would leak. */
+function muted(text: string, active: boolean): string {
+  return active ? text : pc.dim(text);
 }
 
-function label(entry: PickerEntry): string {
+/** Checkbox for a folder-file child: green when checked, muted when off. */
+function fileBox(checked: boolean, active: boolean): string {
+  return checked ? pc.green('[x]') : muted('[ ]', active);
+}
+
+function glyph(entry: PickerEntry, active: boolean): string {
+  if (entry.type === 'file') return fileBox(entry.state !== 'off', active);
+  if (entry.state === 'whole') return pc.green('[x]');
+  if (entry.state === 'partial') return pc.yellow('[~]');
+  return muted('[ ]', active);
+}
+
+function label(entry: PickerEntry, active: boolean): string {
   if (entry.type !== 'dir') return entry.name;
   const suffix =
     entry.state === 'partial'
-      ? pc.dim(` (${entry.children.filter((c) => c.checked).length} file(s))`)
-      : pc.dim('/');
-  return `${entry.name}${suffix}`;
+      ? ` (${entry.children.filter((c) => c.checked).length} file(s))`
+      : '/';
+  return `${entry.name}${muted(suffix, active)}`;
+}
+
+/** Join row fragments; bold the whole line when it's the active (cursor) row.
+ *  Fragments carry only color styling (reset \x1b[39m), never dim, so the bold
+ *  wrap has no reset-code collision. */
+function styleRow(active: boolean, ...parts: string[]): string {
+  const line = parts.join(' ');
+  return active ? pc.bold(line) : line;
 }
 
 /** Choose the slice of `count` list rows to show in `height` lines, keeping the
@@ -290,8 +310,9 @@ function viewLines(model: PickerModel): {
 } {
   if (model.view === 'top') {
     const rows = model.entries.map((entry, i) => {
-      const pointer = i === model.cursor ? pc.cyan('❯') : ' ';
-      return `${pointer} ${glyph(entry)} ${label(entry)}`;
+      const active = i === model.cursor;
+      const pointer = active ? pc.cyan('❯') : ' ';
+      return styleRow(active, pointer, glyph(entry, active), label(entry, active));
     });
     return {
       header: [pc.bold('Select paths to sync'), ''],
@@ -302,9 +323,10 @@ function viewLines(model: PickerModel): {
   }
   const entry = model.activeFolder === null ? undefined : model.entries[model.activeFolder];
   if (model.view === 'folder-choice' && entry) {
-    const rows = ['Whole folder', 'Pick specific files'].map(
-      (opt, i) => `${i === model.subCursor ? pc.cyan('❯') : ' '} ${opt}`,
-    );
+    const rows = ['Whole folder', 'Pick specific files'].map((opt, i) => {
+      const active = i === model.subCursor;
+      return styleRow(active, active ? pc.cyan('❯') : ' ', opt);
+    });
     return {
       header: [pc.bold(`${entry.name}/`), ''],
       rows,
@@ -316,10 +338,11 @@ function viewLines(model: PickerModel): {
     const rows =
       entry.children.length === 0
         ? [pc.dim('  (no files found)')]
-        : entry.children.map(
-            (child, i) =>
-              `${i === model.subCursor ? pc.cyan('❯') : ' '} ${child.checked ? '[x]' : '[ ]'} ${child.relPath}`,
-          );
+        : entry.children.map((child, i) => {
+            const active = i === model.subCursor;
+            const pointer = active ? pc.cyan('❯') : ' ';
+            return styleRow(active, pointer, fileBox(child.checked, active), child.relPath);
+          });
     return {
       header: [pc.bold(`${entry.name}/ — pick files`), ''],
       rows,
